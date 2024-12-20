@@ -3,6 +3,7 @@
 
 {% block content %}
     <p class="post-meta">By {{ post.author }} (Posted on {{ post.created_at }})</p>
-    <p class="post-content">{{ post.content }}</p><a href="#">Edit Post</a>
-{% endblock %}
+    <p class="post-content">{{ post.content }}</p>
 
+    <a href="{{ url_for('edit_page', post_id=post.id) }}">Edit Post</a>
+{% endblock %}
