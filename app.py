@@ -28,6 +28,22 @@ def create_post_action():
     db.session.commit()
     return redirect(url_for("index"))
 
+
+@app.route("/login", methods=["GET"])
+def user_login_page():
+    return render_template("login.html")
+
+@app.route("/login", methods=["POST"])
+def user_login_action():
+    post = BlogPost(
+        username=request.form["username"],
+        password=request.form["password"],
+        
+    )
+    db.session.add(post)
+    db.session.commit()
+    return redirect(url_for("index"))
+
 @app.route("/post/<int:post_id>")
 def post(post_id):
     post = BlogPost.query.get_or_404(post_id)
