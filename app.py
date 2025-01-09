@@ -83,6 +83,16 @@ def stats():
         total_length=sum(post_lengths),
     )
 
+@app.route('/account')  
+def account():  
+    user_info = {  
+        'username': 'johndoe',  
+        'email': 'johndoe@example.com',  
+        'creation_date': '2023-01-01'  
+    }  
+    return render_template('account.html', **user_info)  
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)
