@@ -28,11 +28,12 @@ def create_post_action():
     db.session.commit()
     return redirect(url_for("index"))
 
-
+#this creates the button for the login page 
 @app.route("/login", methods=["GET"])
 def user_login_page():
     return render_template("login.html")
 
+#this creates the login page form 
 @app.route("/login", methods=["POST"])
 def user_login_action():
     post = BlogPost(
