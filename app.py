@@ -1,8 +1,11 @@
 from flask import Flask, render_template, request, redirect, url_for
-from models import BlogPost, db
+from models import BlogPost, UserLogin, db
+from login import app, authenticate_user, User, login_manager
 from statistics import median, mean
+from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)
+bcrypt = Bcrypt(app)
 app.config.from_object('config')  # Load configuration from config.py and particularly the DBMS URI
 
 with app.app_context():
@@ -28,22 +31,61 @@ def create_post_action():
     db.session.commit()
     return redirect(url_for("index"))
 
+#this creates the button for the register page 
+@app.route("/register", methods=["GET"])
+def register_page():
+    return render_template("register.html")
+
+#process to register a user 
+@app.route('/register', methods=['POST'])
+def register():
+    try:
+        # Get the username and password from the form
+        username = request.form['username']
+        raw_password = request.form['password']
+
+        # Hash the password
+        hashed_password = bcrypt.generate_password_hash(raw_password).decode('utf-8')
+
+        # Create a new UserLogin instance
+        new_user = UserLogin(username=username, password=hashed_password)
+
+        # Add the user to the database
+        db.session.add(new_user)
+        db.session.commit()
+
+        print(f'Registered new user: {username}')
+        return redirect(url_for('user_login_page'))  # Redirect to the login page
+    except Exception as error:
+        # Handle errors (e.g., username already exists)
+        print('Error registering new user:', error)
+        return 'An error occurred during registration.', 500
+
+
 #this creates the button for the login page 
 @app.route("/login", methods=["GET"])
 def user_login_page():
     return render_template("login.html")
 
 #this creates the login page form 
-@app.route("/login", methods=["POST"])
+@app.route("/login", methods=["GET", "POST"])
 def user_login_action():
-    post = BlogPost(
-        username=request.form["username"],
-        password=request.form["password"],
-        
-    )
-    db.session.add(post)
-    db.session.commit()
-    return redirect(url_for("index"))
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+
+        # Authenticate the user
+        user, error = authenticate_user(username, password)
+        if user:
+            # Login successful
+            return redirect(url_for("index"))
+        else:
+            # Pass the error message to the template
+            return render_template("login.html", error=error)
+
+    # Render the login page with no error by default
+    return render_template("login.html", error=None)
+
 
 @app.route("/post/<int:post_id>")
 def post(post_id):
