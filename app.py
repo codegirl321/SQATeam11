@@ -125,14 +125,24 @@ def stats():
         total_length=sum(post_lengths),
     )
 
-@app.route('/account')  
+
+# Simulated user data  
+user_data = {  
+    'username': 'johndoe',  
+    'email': 'johndoe@example.com',  
+    'creation_date': '2021-01-01',  
+    'bio': 'This is my bio.'  
+}  
+
+@app.route('/account', methods=['GET', 'POST'])  
 def account():  
-    user_info = {  
-        'username': 'johndoe',  
-        'email': 'johndoe@example.com',  
-        'creation_date': '2023-01-01'  
-    }  
-    return render_template('account.html', **user_info)  
+    if request.method == 'POST':  
+        new_bio = request.form.get('bio')  
+        if new_bio:  
+            user_data['bio'] = new_bio  
+            return redirect(url_for('account'))  
+  
+    return render_template('account.html', **user_data)  
 
 
 

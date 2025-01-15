@@ -3,44 +3,27 @@
   
 {% block content %}  
     <h2>Account Information</h2>  
-
-
-    <h3>Profile Account Information</h3>
-    <div>
-        {% if profile_pic_url %}
-            <img src="{{profile_pic_url}}" alt="Profile Picture">
-        {% else %}
-            <img src="{{url_for('static', filename='default_profie.jpg')}}" alt="Default Profile Picture">
-        {% endif %}
-    </div>
-    <br>
-    <form method="POST" action="#" enctype="multipart/form-data">
-        <label for="profile_pic">Upload New Profile Picture</label><br>
-        <Input type="file" name="profile_pic" id="profile_pic" accept="image/*"><br><br>
-        <button type="submit">Upload</button>
-
-    </form>
-
-    <p><strong>Username:</strong> {{ username }}</p>
-    <p><strong>Email:</strong> {{ email }}</p> 
-    <p><strong>Account Created:</strong> {{ creation_date }}</p>
-
+  
+    <h3>Profile Account Information</h3>  
+    <p><strong>Username:</strong> {{ username }}</p>  
+    <p><strong>Email:</strong> {{ email }}</p>  
+    <p><strong>Account Created:</strong> {{ creation_date }}</p>  
+  
     <br>  
-
-    <h3>Bio</h3>
-    <p>
-        {% if bio %}
-            {{ bio }}
-        {% else %}
-            No bio added yet. <a href="#"> Add one here</a>
-        {% endif %}
-    </p>
-    <br>
-
+  
+    <h3>Bio</h3>  
+    <form method="POST" action="{{ url_for('account') }}">  
+        <textarea name="bio" rows="4" cols="50">{{ bio }}</textarea>  
+        <br>  
+        <button type="submit">Save Bio</button>  
+    </form>  
+    <br>  
+  
     <h3>Profile Actions</h3>  
     <ul>  
-        <li><a href="{{ url_for('account') }}">Edit Account</a></li>   
+        <li><a href="{{ url_for('account') }}">Edit Account</a></li>  
     </ul>  
+
+    <h3>Log Out</h3>  
+    
 {% endblock %}  
-
-
