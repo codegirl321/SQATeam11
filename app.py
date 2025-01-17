@@ -5,6 +5,9 @@ from models import BlogPost, UserLogin, db
 from login import authenticate_user  # Import the authenticate_user function
 from statistics import median, mean
 from sqlalchemy.exc import IntegrityError  # Import IntegrityError for database constraint violations
+from sqlalchemy import asc, desc  # Import for sorting
+from sqlalchemy.orm import aliased  # Import aliased for joins
+
 
 # Initialize the Flask app
 app = Flask(__name__)
@@ -31,10 +34,41 @@ with app.app_context():
     db.init_app(app)
     db.create_all()  # Create database tables for models
 
-# Home route to display all blog posts
-@app.route("/")
+# Home route to display all blog posts with search and sorting functionality
+@app.route("/", methods=["GET"])
 def index():
-    return render_template("index.html", posts=BlogPost.query.all())  # Pass all posts to template
+    # Get search query and sorting criteria from request
+    search_query = request.args.get('search', '')
+    sort_by = request.args.get('sort_by', 'date_desc')
+
+    # Filter posts based on search query
+    posts_query = BlogPost.query
+    if search_query:
+        # Create an alias for UserLogin to join with BlogPost
+        user_alias = aliased(UserLogin)
+        
+        # Filter by title, content, or username
+        posts_query = posts_query.join(user_alias, BlogPost.user).filter(
+            (BlogPost.title.ilike(f"%{search_query}%")) |
+            (BlogPost.content.ilike(f"%{search_query}%")) |
+            (user_alias.username.ilike(f"%{search_query}%"))
+        )
+
+    # Apply sorting before fetching the data
+    if sort_by == 'date_asc':
+        posts_query = posts_query.order_by(asc(BlogPost.created_at))
+    elif sort_by == 'date_desc':
+        posts_query = posts_query.order_by(desc(BlogPost.created_at))
+    elif sort_by == 'title_asc':
+        posts_query = posts_query.order_by(asc(BlogPost.title))
+    elif sort_by == 'title_desc':
+        posts_query = posts_query.order_by(desc(BlogPost.title))
+
+    # Fetch the posts from the database
+    posts = posts_query.all()
+
+    return render_template("index.html", posts=posts)
+
 
 # Route to show the create post form
 @app.route("/create", methods=["GET"])
