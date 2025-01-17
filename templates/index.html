@@ -1,10 +1,37 @@
-{% set title = "Blog Posts" %}
 {% extends 'base.html' %}
 
 {% block content %}
+    <h1>Blog Posts</h1>
+
+    <Search Bar>
+    <form method="GET" action="{{ url_for('index') }}">
+        <input type="text" name="search" placeholder="Search for posts" value="{{ request.args.get('search', '') }}">
+        <select name="sort_by">
+            <option value="date_desc" {% if request.args.get('sort_by') == 'date_desc' %}selected{% endif %}>Date Descending</option>
+            <option value="date_asc" {% if request.args.get('sort_by') == 'date_asc' %}selected{% endif %}>Date Ascending</option>
+            <option value="title_asc" {% if request.args.get('sort_by') == 'title_asc' %}selected{% endif %}>Title Ascending</option>
+            <option value="title_desc" {% if request.args.get('sort_by') == 'title_desc' %}selected{% endif %}>Title Descending</option>
+        </select>
+        <button type="submit">Search & Sort</button>
+    </form>
+    
+
+    <!-- Sort Dropdown -->
+    <form method="GET" action="{{ url_for('index') }}">
+        <select name="sort_by" onchange="this.form.submit()">
+            <option value="date_desc" {% if request.args.get('sort_by') == 'date_desc' %}selected{% endif %}>Sort by Date (Newest First)</option>
+            <option value="date_asc" {% if request.args.get('sort_by') == 'date_asc' %}selected{% endif %}>Sort by Date (Oldest First)</option>
+            <option value="title_asc" {% if request.args.get('sort_by') == 'title_asc' %}selected{% endif %}>Sort by Title (A-Z)</option>
+            <option value="title_desc" {% if request.args.get('sort_by') == 'title_desc' %}selected{% endif %}>Sort by Title (Z-A)</option>
+        </select>
+    </form>
+
     <ul>
         {% for post in posts %}
-        <li><a href="{{ url_for('post',post_id=post.id) }}">{{ post.title }} by {{ post.author}} ({{ post.created_at }})</a></li>
+            <li>
+                <a href="{{ url_for('post', post_id=post.id) }}">{{ post.title }}</a> - {{ post.author }} ({{ post.created_at }})
+            </li>
         {% endfor %}
     </ul>
+
 {% endblock %}
