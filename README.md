@@ -1,9 +1,17 @@
 # SQATeam11
-Software Quality Assurance module work
-
 # Flask Blog Application
 
 This is a simple Flask-based blog application where users can register, log in, create, edit, and delete blog posts. Admin users have access to all blog posts, while regular users can only manage their own posts.
+
+
+## Run the application:
+
+python -m venv venv 
+venv\Scripts\activate
+pip install -r requirements.txt
+flask run
+Open your browser and go to http://127.0.0.1:5000/ to start using the application.
+
 
 ## Features
 
@@ -22,15 +30,9 @@ This is a simple Flask-based blog application where users can register, log in, 
 - Flask-SQLAlchemy
 - SQLite (or any other database supported by SQLAlchemy)
 
-Run the application:
 
-python -m venv venv 
-venv\Scripts\activate
-flask run
-Open your browser and go to http://127.0.0.1:5000/ to start using the application.
+## Environment Variables
 
-
-Environment Variables
 SECRET_KEY: Flask's secret key used for session management. It should be kept secret.
 DATABASE_URL: The URL to the database. By default, the app uses SQLite (sqlite:///db.sqlite3).
 Application Structure
