@@ -1,29 +1,24 @@
-{% set title = "Account Information" %}  
-{% extends 'base.html' %}  
-  
-{% block content %}  
-    <h2>Account Information</h2>  
-  
-    <h3>Profile Account Information</h3>  
-    <p><strong>Username:</strong> {{ username }}</p>  
-    <p><strong>Email:</strong> {{ email }}</p>  
-    <p><strong>Account Created:</strong> {{ creation_date }}</p>  
-  
-    <br>  
-  
-    <h3>Bio</h3>  
-    <form method="POST" action="{{ url_for('account') }}">  
-        <textarea name="bio" rows="4" cols="50">{{ bio }}</textarea>  
-        <br>  
-        <button type="submit">Save Bio</button>  
-    </form>  
-    <br>  
-  
-    <h3>Profile Actions</h3>  
-    <ul>  
-        <li><a href="{{ url_for('account') }}">Edit Account</a></li>  
-    </ul>  
+{% set title = "Account Information" %}
+{% extends 'base.html' %}
 
-    <h3>Log Out</h3>  
-    
-{% endblock %}  
+{% block content %}
+    <h2>Account Information</h2>
+
+    <h3>Profile Account Information</h3>
+    <p><strong>Username:</strong> {{ current_user.username }}</p>
+    <p><strong>Account Created:</strong> {{ current_user.created_at.strftime('%Y-%m-%d') }}</p>
+
+    <br>
+
+    <h3>Your Posts</h3>
+    <ul>
+        {% for post in posts %}
+            <li>
+                <a href="{{ url_for('post', post_id=post.id) }}">{{ post.title }}</a> - {{ post.created_at.strftime('%Y-%m-%d') }}
+            </li>
+        {% else %}
+            <li>No posts created yet.</li>
+        {% endfor %}
+    </ul>
+
+{% endblock %}

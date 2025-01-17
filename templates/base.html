@@ -1,33 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        {# Set the `title` variable in each template that extends this one #}
-        <title>{{ title }}</title>
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
-    </head>
-    <body>
-        <header>
-            <h1>Blog with Flask</h1>
-            <nav class="navbar">
-                <ul>
-                    <li><a href="{{ url_for('index') }}">Home</a></li>
-                    <li><a href="{{ url_for('create_post_action') }}">Create Post</a></li>
+<head>
+    <title>{{ title }}</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Blog with Flask</h1>
+        <nav class="navbar">
+            <ul>
+                <li><a href="{{ url_for('index') }}">Home</a></li>
+                <li><a href="{{ url_for('create_post_page') }}">Create Post</a></li>
+                
+                {% if current_user.is_authenticated %}
+                    <!-- Show logout link if the user is logged in -->
+                    <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                {% else %}
+                    <!-- Show login and register links if the user is not logged in -->
                     <li><a href="{{ url_for('user_login_action') }}">Login</a></li>
                     <li><a href="{{ url_for('register_page') }}">Register</a></li>
-                    <li><a href="#">Stats</a></li>
-                    <li><a href="#">Account Profile</a></li>
+                {% endif %}
 
-                    {% if current_user.is_authenticated %}
-                        <li><a href="{{ url_for('logout') }}">Logout</a></li>
-                    {% else %}
-                        <li><a href="{{ url_for('login') }}">Login</a></li>
-                    {% endif %}
-                </ul>
-            </nav>
-        </header>
-        <main>
-            <h1>{{ title }}</h1>
-            {% block content %}{% endblock %}
-        </main>
-    </body>
+                <li><a href="{{ url_for('stats') }}">Stats</a></li>
+                <li><a href="{{ url_for('account') }}">Account Profile</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h1>{{ title }}</h1>
+        {% block content %}{% endblock %}
+    </main>
+</body>
 </html>
