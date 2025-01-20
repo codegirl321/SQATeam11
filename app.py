@@ -1,3 +1,4 @@
+import re
 from flask import Flask, render_template, request, redirect, url_for
 from flask_login import LoginManager, current_user, login_required, login_user, logout_user
 from flask_bcrypt import Bcrypt
@@ -96,30 +97,47 @@ def create_post_action():
 def register_page():
     return render_template("register.html")
 
+# Password validation function
+def validate_password(password):
+    """
+    Validates that the password:
+    - Is at least 8 characters long.
+    - Contains both letters and numbers.
+    - Contains at least one special character.
+    """
+    if len(password) < 8:
+        return False, "Password must be at least 8 characters long."
+    if not re.search(r"[A-Za-z]", password):
+        return False, "Password must contain at least one letter."
+    if not re.search(r"\d", password):
+        return False, "Password must contain at least one number."
+    if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", password):
+        return False, "Password must contain at least one special character."
+    return True, None
+
 # Route to handle user registration (POST)
 @app.route('/register', methods=['POST'])
 def register():
-    try:
-        username = request.form['username']
-        raw_password = request.form['password']
+    """Register route to handle user registration."""
+    username = request.form.get('username')
+    password = request.form.get('password')
 
-        # Hash the password
-        hashed_password = bcrypt.generate_password_hash(raw_password).decode('utf-8')
+    # Validate password
+    is_valid, error = validate_password(password)
+    if not is_valid:
+        return render_template("register.html", error=error)
 
-        # Create a new user and add to the database
-        new_user = UserLogin(username=username, password=hashed_password)
+    # Check if the username already exists
+    if UserLogin.query.filter_by(username=username).first():
+        return render_template("register.html", error="Username already exists.")
 
-        db.session.add(new_user)
-        db.session.commit()
+    # Hash the password and store the user
+    hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+    new_user = UserLogin(username=username, password=hashed_password)
 
-        return redirect(url_for('user_login_action'))  # Redirect to login page
-    except IntegrityError:
-        db.session.rollback()  # Rollback the transaction if a database error occurs
-        error_message = "Username already exists. Please choose a different one."
-        return render_template("register.html", error=error_message)  # Return with error message
-    except Exception as error:
-        db.session.rollback()  # Rollback for any other unexpected errors
-        return f'An error occurred during registration: {error}', 500  # Handle errors gracefully
+    db.session.add(new_user)
+    db.session.commit()
+    return render_template("login.html", success="User registered successfully.")
 
 # User login route (GET and POST)
 @app.route("/login", methods=["GET", "POST"])
